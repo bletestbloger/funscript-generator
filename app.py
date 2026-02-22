@@ -1,10 +1,12 @@
 # app.py
+import os
 from flask import Flask, request, render_template, send_file, jsonify, abort
 import os
 from werkzeug.utils import secure_filename
 from detect_active import process_video  # ← 先ほど提供した関数をインポート
 
 app = Flask(__name__)
+app.config['DEBUG'] = True  # ← これを追加（本番ではFalseに戻す）
 
 # 設定
 app.config['UPLOAD_FOLDER'] = 'uploads'
