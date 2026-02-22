@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funscript Generator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 40px; }
+        #status { margin: 20px; font-weight: bold; color: #333; }
+        #downloadLink { display: none; margin-top: 20px; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+        button { padding: 10px 30px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>動画からFunscriptを生成</h1>
+    <p>対応形式: MP4, AVI, MOV, MKV（最大200MB）</p>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".mp4,.avi,.mov,.mkv" required>
+        <br><br>
+        <button type="submit">アップロードして生成開始</button>
+    </form>
+
+    <div id="status"></div>
+    <a id="downloadLink" href="/download">Funscriptをダウンロード</a>
+
+    <script>
+        $('#uploadForm').on('submit', function(e) {
+            e.preventDefault();
+            $('#status').text('処理中... しばらくお待ちください');
+            $('#downloadLink').hide();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        $('#status').text('処理が完了しました！');
+                        $('#downloadLink').show();
+                    } else {
+                        $('#status').text('エラー: ' + (response.error || '不明なエラー'));
+                    }
+                },
+                error: function(xhr) {
+                    let errMsg = '通信エラー';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errMsg = xhr.responseJSON.error;
+                    }
+                    $('#status').text('エラー: ' + errMsg);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
